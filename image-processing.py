@@ -66,23 +66,24 @@ def denoise(img):
 def main():
     #choose between the colors listed in color_ranges. Make sure that the variable color_to_detect is a string.
     #These color values should probably be tuned better
-    color_to_detect = "green"
+    color_to_detect = "blue"
 
     #Tkinter hello world
+    """
     root = Tk()
     frm = ttk.Frame(root, padding=10)
     frm.grid()
     ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
     ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1,row=0)
     root.mainloop()
-
+"""
     
     vid = cv.VideoCapture(0)
 
     color_ranges = {'red' : [[159,155,85],[179,255,255]],
                     'new_red' : [[0,100,50],[10,255,255],[160,100,50],[179,255,255]],
                     'blue' : [[110,50,50],[130,255,255]],
-                    'green' : [[40,50,50],[80,255,255]],
+                    'green' : [[40,60,50],[80,255,255]],
                     'yellow' : [[25,35,50],[37,255,255]],
                     'orange' : [[15,50,50],[25,255,255]],
                     'purple' : [[125,50,50],[135,255,255]],
@@ -98,14 +99,24 @@ def main():
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
         mask = create_color_mask(color_ranges[color_to_detect], hsv, color_to_detect)
+        mask2 = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+        
+        # Put to rest for now
+        """
+        kernel = np.ones((5,5), np.uint8)
+        img_dilated = cv.dilate(mask,kernel,iterations=0)
+        img_eroded = cv.erode(mask,kernel,iterations=2)
+        # mask with dilation + erosion
+        mask3 = img_eroded
+        cv.imshow('erosion',img_eroded)
+        cv.imshow('dilation',img_dilated)
+        """
         res = cv.bitwise_and(frame,frame,mask=mask)
 
         detect_circle(res, frame)
         
-        #cv.imshow('grayscale', gray)
-        cv.imshow('frame', frame)
-        #cv.imshow('mask', mask)
-        cv.imshow('res', res)
+        stacked = np.hstack((mask2,frame,res))
+        cv.imshow('Frame & Res',cv.resize(stacked,None,fx=0.8,fy=0.8))
 
         k = cv.waitKey(33) & 0xFF
         if k == ord('q'):
