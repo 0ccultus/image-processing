@@ -1,5 +1,7 @@
 import numpy as np
 import cv2 as cv
+from tkinter import *
+from tkinter import ttk
 
 """
 Small test program for messing with video feed processing.
@@ -7,6 +9,13 @@ Currently sets a color mask and can track a circle of the respective color, bare
 
 Author: Julian Ayres
 Start Date: 2022.04.03
+Python Version 3.10.4
+
+Goals:
+-Set up TK window that loads/sets configuration. checkboxes and the like
+-face/hand recognition for funsies
+-active color mask sliders
+
 """
 
 def create_color_mask(colors, hsv_color_window, color_to_detect):
@@ -56,8 +65,17 @@ def denoise(img):
 #Main function. Hit Q to quit while the cameras are running.
 def main():
     #choose between the colors listed in color_ranges. Make sure that the variable color_to_detect is a string.
-    #These should probably be tuned better
+    #These color values should probably be tuned better
     color_to_detect = "green"
+
+    #Tkinter hello world
+    root = Tk()
+    frm = ttk.Frame(root, padding=10)
+    frm.grid()
+    ttk.Label(frm, text="Hello World!").grid(column=0, row=0)
+    ttk.Button(frm, text="Quit", command=root.destroy).grid(column=1,row=0)
+    root.mainloop()
+
     
     vid = cv.VideoCapture(0)
 
@@ -75,8 +93,6 @@ def main():
         _,frame = vid.read()
 
         frame = cv.GaussianBlur(frame, (3,3),0)
-
-        #frame = denoise(res)
         
         # Create various colorspace windows
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
